@@ -1,0 +1,642 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>Registro de Visita</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --verde: #1a6b3c;
+    --verde-claro: #e8f5ee;
+    --vino: #6b1a2a;
+    --gris: #f4f4f2;
+    --gris-borde: #ddd;
+    --texto: #1a1a1a;
+    --texto-suave: #666;
+  }
+
+  body {
+    font-family: Georgia, serif;
+    background: var(--gris);
+    color: var(--texto);
+    min-height: 100vh;
+  }
+
+  header {
+    background: var(--verde);
+    color: white;
+    padding: 18px 20px 14px;
+    text-align: center;
+  }
+
+  header h1 {
+    font-size: 18px;
+    font-weight: normal;
+    letter-spacing: 0.5px;
+  }
+
+  header p {
+    font-size: 12px;
+    opacity: 0.75;
+    margin-top: 3px;
+    font-family: sans-serif;
+  }
+
+  .form-body {
+    padding: 16px;
+    max-width: 520px;
+    margin: 0 auto;
+  }
+
+  .seccion {
+    background: white;
+    border-radius: 10px;
+    padding: 16px;
+    margin-bottom: 14px;
+    border: 1px solid var(--gris-borde);
+  }
+
+  .seccion-titulo {
+    font-size: 11px;
+    font-family: sans-serif;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: var(--verde);
+    margin-bottom: 12px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid var(--verde-claro);
+  }
+
+  label {
+    display: block;
+    font-size: 13px;
+    font-family: sans-serif;
+    color: var(--texto-suave);
+    margin-bottom: 4px;
+    margin-top: 12px;
+  }
+
+  label:first-of-type { margin-top: 0; }
+
+  select, input[type="text"], input[type="number"], textarea {
+    width: 100%;
+    padding: 10px 12px;
+    border: 1px solid var(--gris-borde);
+    border-radius: 7px;
+    font-size: 15px;
+    font-family: sans-serif;
+    background: white;
+    color: var(--texto);
+    appearance: none;
+    -webkit-appearance: none;
+  }
+
+  select {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%23999' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 12px center;
+    padding-right: 36px;
+  }
+
+  textarea {
+    height: 80px;
+    resize: none;
+    line-height: 1.5;
+  }
+
+  /* GPS */
+  .gps-box {
+    background: var(--verde-claro);
+    border-radius: 7px;
+    padding: 10px 12px;
+    font-family: sans-serif;
+    font-size: 13px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .gps-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: #ccc;
+    flex-shrink: 0;
+  }
+
+  .gps-dot.ok { background: #2ecc71; }
+  .gps-dot.error { background: #e74c3c; }
+  .gps-dot.buscando {
+    background: #f39c12;
+    animation: pulsar 1s infinite;
+  }
+
+  @keyframes pulsar {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.3; }
+  }
+
+  /* Fotos */
+  .foto-zona {
+    border: 2px dashed var(--gris-borde);
+    border-radius: 7px;
+    padding: 20px;
+    text-align: center;
+    cursor: pointer;
+    transition: border-color 0.2s;
+  }
+
+  .foto-zona:active { border-color: var(--verde); }
+
+  .foto-zona p {
+    font-family: sans-serif;
+    font-size: 14px;
+    color: var(--texto-suave);
+    margin-top: 8px;
+  }
+
+  .foto-zona span { font-size: 28px; }
+
+  #input-fotos { display: none; }
+
+  .previews {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8px;
+    margin-top: 10px;
+  }
+
+  .previews img {
+    width: 100%;
+    aspect-ratio: 1;
+    object-fit: cover;
+    border-radius: 6px;
+    border: 1px solid var(--gris-borde);
+  }
+
+  /* Productos */
+  .producto-item {
+    border: 1px solid var(--gris-borde);
+    border-radius: 8px;
+    padding: 12px;
+    margin-bottom: 10px;
+  }
+
+  .producto-nombre {
+    font-family: sans-serif;
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--vino);
+    margin-bottom: 10px;
+  }
+
+  .producto-campos {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+  }
+
+  .campo-label {
+    font-family: sans-serif;
+    font-size: 11px;
+    color: var(--texto-suave);
+    margin-bottom: 4px;
+  }
+
+  .toggle-stock {
+    display: flex;
+    border: 1px solid var(--gris-borde);
+    border-radius: 7px;
+    overflow: hidden;
+    height: 40px;
+  }
+
+  .toggle-stock button {
+    flex: 1;
+    border: none;
+    background: white;
+    font-family: sans-serif;
+    font-size: 13px;
+    cursor: pointer;
+    color: var(--texto-suave);
+    transition: all 0.15s;
+  }
+
+  .toggle-stock button.activo-si {
+    background: var(--verde);
+    color: white;
+    font-weight: 600;
+  }
+
+  .toggle-stock button.activo-no {
+    background: var(--vino);
+    color: white;
+    font-weight: 600;
+  }
+
+  /* Botón enviar */
+  .btn-enviar {
+    width: 100%;
+    padding: 16px;
+    background: var(--verde);
+    color: white;
+    border: none;
+    border-radius: 10px;
+    font-size: 16px;
+    font-family: sans-serif;
+    font-weight: 600;
+    cursor: pointer;
+    margin-top: 4px;
+    transition: opacity 0.2s;
+    letter-spacing: 0.3px;
+  }
+
+  .btn-enviar:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+
+  /* Éxito */
+  .pantalla-exito {
+    display: none;
+    text-align: center;
+    padding: 60px 30px;
+  }
+
+  .pantalla-exito .icono { font-size: 60px; margin-bottom: 20px; }
+
+  .pantalla-exito h2 {
+    font-size: 22px;
+    color: var(--verde);
+    margin-bottom: 10px;
+  }
+
+  .pantalla-exito p {
+    font-family: sans-serif;
+    color: var(--texto-suave);
+    margin-bottom: 30px;
+  }
+
+  .btn-nueva {
+    padding: 12px 28px;
+    background: var(--verde);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 15px;
+    font-family: sans-serif;
+    cursor: pointer;
+  }
+
+  .error-msg {
+    background: #fdecea;
+    color: #c0392b;
+    padding: 10px 14px;
+    border-radius: 7px;
+    font-family: sans-serif;
+    font-size: 13px;
+    margin-top: 10px;
+    display: none;
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>Registro de Visita</h1>
+  <p id="fecha-header"></p>
+</header>
+
+<div id="formulario">
+  <div class="form-body">
+
+    <!-- AGENTE Y PDV -->
+    <div class="seccion">
+      <div class="seccion-titulo">Identificación</div>
+
+      <label>Agente</label>
+      <select id="agente">
+        <option value="">Selecionar agente...</option>
+      </select>
+
+      <label>Punto de venta</label>
+      <select id="pdv">
+        <option value="">Selecionar PDV...</option>
+      </select>
+
+      <label>Actividad</label>
+      <select id="actividad">
+        <option value="">Selecionar actividad...</option>
+        <option>Reposição</option>
+        <option>Degustação</option>
+        <option>Treinamento</option>
+        <option>Visita comercial</option>
+        <option>Outro</option>
+      </select>
+    </div>
+
+    <!-- GPS -->
+    <div class="seccion">
+      <div class="seccion-titulo">Ubicación GPS</div>
+      <div class="gps-box">
+        <div class="gps-dot buscando" id="gps-dot"></div>
+        <span id="gps-texto">Obteniendo ubicación...</span>
+      </div>
+    </div>
+
+    <!-- FOTOS -->
+    <div class="seccion">
+      <div class="seccion-titulo">Fotos</div>
+      <div class="foto-zona" onclick="document.getElementById('input-fotos').click()">
+        <span>📷</span>
+        <p>Toca para agregar fotos</p>
+      </div>
+      <input type="file" id="input-fotos" accept="image/*" multiple capture="environment">
+      <div class="previews" id="previews"></div>
+    </div>
+
+    <!-- PRODUCTOS -->
+    <div class="seccion">
+      <div class="seccion-titulo">Productos en góndola</div>
+      <div id="productos-lista"></div>
+    </div>
+
+    <!-- ATENDENTE Y NOTAS -->
+    <div class="seccion">
+      <div class="seccion-titulo">Observaciones</div>
+
+      <label>Nombre del atendente</label>
+      <input type="text" id="atendente" placeholder="Nombre de quien atendió">
+
+      <label>Notas</label>
+      <textarea id="notas" placeholder="Observaciones, incidencias, etc."></textarea>
+    </div>
+
+    <div class="error-msg" id="error-msg"></div>
+
+    <button class="btn-enviar" id="btn-enviar" onclick="enviarVisita()">
+      Registrar visita
+    </button>
+
+    <div style="height: 30px;"></div>
+  </div>
+</div>
+
+<!-- PANTALLA ÉXITO -->
+<div class="pantalla-exito" id="pantalla-exito">
+  <div class="icono">✅</div>
+  <h2>Visita registrada</h2>
+  <p>Los datos fueron guardados correctamente.</p>
+  <button class="btn-nueva" onclick="nuevaVisita()">Registrar otra visita</button>
+</div>
+
+<script>
+const SUPABASE_URL = 'https://ywswbjwbvrohsgmrhoob.supabase.co';
+const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inl3c3diandidnJvaHNnbXJob29iIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzc0MDA3OTAsImV4cCI6MjA5Mjk3Njc5MH0.OwgOk_ds7nLrun63ScgZnwFkrW36v1WgWrMIxTgEn-w';
+// Función base para llamar a Supabase directamente
+async function sbFetch(tabla, params) {
+  const res = await fetch(SUPABASE_URL + '/rest/v1/' + tabla + '?' + params, {
+    headers: {
+      'apikey': SUPABASE_KEY,
+      'Authorization': 'Bearer ' + SUPABASE_KEY
+    }
+  });
+  return res.json();
+}
+
+async function sbPost(tabla, body) {
+  const res = await fetch(SUPABASE_URL + '/rest/v1/' + tabla, {
+    method: 'POST',
+    headers: {
+      'apikey': SUPABASE_KEY,
+      'Authorization': 'Bearer ' + SUPABASE_KEY,
+      'Content-Type': 'application/json',
+      'Prefer': 'return=representation'
+    },
+    body: JSON.stringify(body)
+  });
+  return res.json();
+}
+
+const productos = [
+  { id: 1, nombre: 'Traversa Merlot' },
+  { id: 2, nombre: 'Traversa Rosé' },
+  { id: 3, nombre: 'Traversa Tannat' },
+  { id: 4, nombre: 'Traversa Tannat Roble' },
+  { id: 5, nombre: 'Noble Alianza M-TT-M' },
+  { id: 6, nombre: 'Noble Alianza CF-TT-MA' },
+];
+
+let gpsLat = null, gpsLng = null, gpsPrecision = null;
+let fotosSeleccionadas = [];
+
+// Fecha en header
+const ahora = new Date();
+document.getElementById('fecha-header').textContent =
+  ahora.toLocaleDateString('pt-BR', { weekday: 'long', day: 'numeric', month: 'long' });
+
+// Cargar agentes
+async function cargarAgentes() {
+  const data = await sbFetch('agentes', 'activo=eq.true&order=nombre&select=id,nombre');
+  const sel = document.getElementById('agente');
+  if (Array.isArray(data)) data.forEach(a => {
+    const opt = document.createElement('option');
+    opt.value = a.id;
+    opt.textContent = a.nombre;
+    sel.appendChild(opt);
+  });
+}
+
+// Cargar PDVs
+async function cargarPDVs() {
+  const data = await sbFetch('pdvs', 'activo=eq.true&order=nombre&select=id,codigo,nombre');
+  const sel = document.getElementById('pdv');
+  if (Array.isArray(data)) data.forEach(p => {
+    const opt = document.createElement('option');
+    opt.value = p.id;
+    opt.textContent = p.codigo ? (p.codigo + ' - ' + p.nombre) : p.nombre;
+    sel.appendChild(opt);
+  });
+}
+
+// GPS
+function obtenerGPS() {
+  if (!navigator.geolocation) {
+    document.getElementById('gps-texto').textContent = 'GPS no disponible';
+    document.getElementById('gps-dot').className = 'gps-dot error';
+    return;
+  }
+  navigator.geolocation.getCurrentPosition(
+    pos => {
+      gpsLat = pos.coords.latitude;
+      gpsLng = pos.coords.longitude;
+      gpsPrecision = Math.round(pos.coords.accuracy);
+      document.getElementById('gps-texto').textContent =
+        `Ubicación obtenida (±${gpsPrecision}m)`;
+      document.getElementById('gps-dot').className = 'gps-dot ok';
+    },
+    () => {
+      document.getElementById('gps-texto').textContent = 'No se pudo obtener la ubicación';
+      document.getElementById('gps-dot').className = 'gps-dot error';
+    },
+    { enableHighAccuracy: true, timeout: 15000 }
+  );
+}
+
+// Productos
+function renderProductos() {
+  const contenedor = document.getElementById('productos-lista');
+  productos.forEach(p => {
+    const div = document.createElement('div');
+    div.className = 'producto-item';
+    div.innerHTML = `
+      <div class="producto-nombre">${p.nombre}</div>
+      <div class="producto-campos">
+        <div>
+          <div class="campo-label">Unidades en góndola</div>
+          <input type="number" min="0" id="gondola-${p.id}" placeholder="0" style="width:100%;padding:9px 10px;border:1px solid #ddd;border-radius:7px;font-size:16px;font-family:sans-serif;">
+        </div>
+        <div>
+          <div class="campo-label">Stock en depósito</div>
+          <div class="toggle-stock">
+            <button id="si-${p.id}" onclick="setStock(${p.id}, true)">Sí</button>
+            <button id="no-${p.id}" onclick="setStock(${p.id}, false)">No</button>
+          </div>
+        </div>
+      </div>
+    `;
+    contenedor.appendChild(div);
+  });
+}
+
+const stockValues = {};
+function setStock(id, valor) {
+  stockValues[id] = valor;
+  document.getElementById(`si-${id}`).className = valor ? 'activo-si' : '';
+  document.getElementById(`no-${id}`).className = !valor ? 'activo-no' : '';
+}
+
+// Fotos preview
+document.getElementById('input-fotos').addEventListener('change', function(e) {
+  const nuevas = Array.from(e.target.files);
+  fotosSeleccionadas = fotosSeleccionadas.concat(nuevas);
+  const previews = document.getElementById('previews');
+  nuevas.forEach(file => {
+    const wrapper = document.createElement('div');
+    wrapper.style.cssText = 'position:relative';
+    const img = document.createElement('img');
+    img.src = URL.createObjectURL(file);
+    const btn = document.createElement('button');
+    btn.textContent = 'x';
+    btn.style.cssText = 'position:absolute;top:3px;right:3px;background:rgba(0,0,0,0.6);color:white;border:none;border-radius:50%;width:22px;height:22px;font-size:11px;cursor:pointer;';
+    btn.onclick = function() {
+      const idx = Array.from(previews.children).indexOf(wrapper);
+      fotosSeleccionadas.splice(idx, 1);
+      previews.removeChild(wrapper);
+    };
+    wrapper.appendChild(img);
+    wrapper.appendChild(btn);
+    previews.appendChild(wrapper);
+  });
+  this.value = '';
+});
+
+// Enviar
+async function enviarVisita() {
+  const agente_id = document.getElementById('agente').value;
+  const pdv_id = document.getElementById('pdv').value;
+  const actividad = document.getElementById('actividad').value;
+  const atendente = document.getElementById('atendente').value.trim();
+  const notas = document.getElementById('notas').value.trim();
+  const errorDiv = document.getElementById('error-msg');
+
+  errorDiv.style.display = 'none';
+
+  if (!agente_id || !pdv_id || !actividad) {
+    errorDiv.textContent = 'Por favor completá agente, PDV y actividad.';
+    errorDiv.style.display = 'block';
+    return;
+  }
+
+  const btn = document.getElementById('btn-enviar');
+  btn.disabled = true;
+  btn.textContent = 'Guardando...';
+
+  try {
+    // Insertar visita
+    const visitaData = await sbPost('visitas', {
+      agente_id: parseInt(agente_id),
+      pdv_id: parseInt(pdv_id),
+      actividad: actividad,
+      nombre_atendente: atendente || null,
+      notas: notas || null,
+      lat: gpsLat,
+      lng: gpsLng,
+      precision_metros: gpsPrecision
+    });
+
+    if (!Array.isArray(visitaData) || visitaData.length === 0) throw new Error('Error al guardar visita');
+    const visitaId = visitaData[0].id;
+
+    // Insertar productos
+    const prods = productos.map(p => ({
+      visita_id: visitaId,
+      producto_id: p.id,
+      unidades_gondola: parseInt(document.getElementById('gondola-' + p.id).value) || 0,
+      stock_deposito: stockValues[p.id] !== undefined ? stockValues[p.id] : null
+    }));
+
+    await sbPost('visita_productos', prods);
+
+    // Subir fotos
+    for (let i = 0; i < fotosSeleccionadas.length; i++) {
+      const foto = fotosSeleccionadas[i];
+      const ext = foto.name.split('.').pop();
+      const path = 'visita-' + visitaId + '-' + i + '.' + ext;
+
+      btn.textContent = 'Subiendo foto ' + (i+1) + ' de ' + fotosSeleccionadas.length + '...';
+
+      const uploadRes = await fetch(SUPABASE_URL + '/storage/v1/object/fotos-visitas/' + path, {
+        method: 'POST',
+        headers: {
+          'apikey': SUPABASE_KEY,
+          'Authorization': 'Bearer ' + SUPABASE_KEY,
+          'Content-Type': foto.type
+        },
+        body: foto
+      });
+
+      if (uploadRes.ok) {
+        const fotoUrl = SUPABASE_URL + '/storage/v1/object/public/fotos-visitas/' + path;
+        await sbPost('fotos', { visita_id: visitaId, url: fotoUrl });
+      }
+    }
+
+    // Éxito
+    document.getElementById('formulario').style.display = 'none';
+    document.getElementById('pantalla-exito').style.display = 'block';
+
+  } catch (err) {
+    errorDiv.textContent = 'Error al guardar. Verificá tu conexión e intentá nuevamente.';
+    errorDiv.style.display = 'block';
+    btn.disabled = false;
+    btn.textContent = 'Registrar visita';
+    console.error(err);
+  }
+}
+
+function nuevaVisita() {
+  location.reload();
+}
+
+// Inicializar — productos primero (no dependen de la base)
+renderProductos();
+obtenerGPS();
+cargarAgentes();
+cargarPDVs();
+</script>
+</body>
+</html>
