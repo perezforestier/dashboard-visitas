@@ -135,7 +135,7 @@ tabla = dff[['fecha', 'hora', 'agente', 'pdv', 'actividad', 'atendente', 'distan
 tabla.columns = ['Fecha', 'Hora', 'Agente', 'PDV', 'Actividad', 'Atendente', 'Distancia (m)', 'Precisión GPS', 'Notas']
 
 st.dataframe(
-    tabla.style.applymap(color_distancia, subset=['Distancia (m)']),
+    tabla.style.map(color_distancia, subset=['Distancia (m)'])
     use_container_width=True,
     hide_index=True
 )
