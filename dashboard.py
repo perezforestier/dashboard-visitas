@@ -6,8 +6,9 @@ from streamlit_folium import st_folium
 from datetime import datetime, timedelta
 
 # Configuración
-SUPABASE_URL = 'https://ywswbjwbvrohsgmrhoob.supabase.co'
-SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inl3c3diandidnJvaHNnbXJob29iIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzc0MDA3OTAsImV4cCI6MjA5Mjk3Njc5MH0.OwgOk_ds7nLrun63ScgZnwFkrW36v1WgWrMIxTgEn-w'
+import os
+SUPABASE_URL = os.environ.get('SUPABASE_URL')
+SUPABASE_KEY = os.environ.get('SUPABASE_KEY')
 HEADERS = {
     'apikey': SUPABASE_KEY,
     'Authorization': f'Bearer {SUPABASE_KEY}'
